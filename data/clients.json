@@ -88,6 +88,146 @@
         "Residence and employment history (last 5 years)",
         "Federal tax returns or IRS transcripts (last 5 years)"
       ]
+    },
+    {
+      "case_id": "IMM-2026-0105",
+      "full_name": "Samuel Okoye",
+      "address": {
+        "street": "590 Oak Hollow Lane",
+        "city": "Raleigh",
+        "state": "NC",
+        "postal_code": "27601"
+      },
+      "email": "samuel.okoye@example.com",
+      "phone": "(919) 555-0134",
+      "country_of_citizenship": "Nigeria",
+      "case_type": "H-1B Work Visa",
+      "assigned_attorney": "Daniel K. Morrison",
+      "date_opened": "2026-08-12",
+      "documents_received": [
+        "Passport (biographic page)",
+        "Degree certificates",
+        "Academic transcripts",
+        "Credential evaluation (for foreign degrees)",
+        "Resume / CV",
+        "Employer support letter",
+        "Labor Condition Application (LCA)",
+        "Current I-94 record"
+      ]
+    },
+    {
+      "case_id": "IMM-2026-0106",
+      "full_name": "Sofia Rossi",
+      "address": {
+        "street": "1220 Garden Street, Apt 3",
+        "city": "Hoboken",
+        "state": "NJ",
+        "postal_code": "07030"
+      },
+      "email": "sofia.rossi@example.com",
+      "phone": "(201) 555-0187",
+      "country_of_citizenship": "Italy",
+      "case_type": "Family-Based Green Card",
+      "assigned_attorney": "Elena V. Petrova",
+      "date_opened": "2026-09-05",
+      "documents_received": [
+        "Marriage certificate",
+        "Birth certificate",
+        "Passport (biographic page)",
+        "Passport-style photos (2)",
+        "Proof of spouse's U.S. citizenship",
+        "Joint financial records",
+        "Photos and correspondence showing the relationship"
+      ]
+    },
+    {
+      "case_id": "IMM-2026-0107",
+      "full_name": "Ahmad Karimi",
+      "address": {
+        "street": "78 Linden Avenue, Unit 4",
+        "city": "Sacramento",
+        "state": "CA",
+        "postal_code": "95814"
+      },
+      "email": "ahmad.karimi@example.com",
+      "phone": "(916) 555-0152",
+      "country_of_citizenship": "Afghanistan",
+      "case_type": "Asylum",
+      "assigned_attorney": "Elena V. Petrova",
+      "date_opened": "2026-10-01",
+      "documents_received": []
+    },
+    {
+      "case_id": "IMM-2026-0108",
+      "full_name": "Maria Santos",
+      "address": {
+        "street": "2405 Cypress Bend",
+        "city": "Houston",
+        "state": "TX",
+        "postal_code": "77002"
+      },
+      "email": "maria.santos@example.com",
+      "phone": "(713) 555-0129",
+      "country_of_citizenship": "Philippines",
+      "case_type": "Naturalization",
+      "assigned_attorney": "Daniel K. Morrison",
+      "date_opened": "2026-09-18",
+      "documents_received": [
+        "Permanent resident card (front and back)",
+        "Passport (biographic page)",
+        "Passport-style photos (2)",
+        "Residence and employment history (last 5 years)"
+      ]
+    },
+    {
+      "case_id": "IMM-2026-0109",
+      "full_name": "Kenji Watanabe",
+      "address": {
+        "street": "16 Beacon Hill Road",
+        "city": "Boston",
+        "state": "MA",
+        "postal_code": "02108"
+      },
+      "email": "kenji.watanabe@example.com",
+      "phone": "(617) 555-0116",
+      "country_of_citizenship": "Japan",
+      "case_type": "H-1B Work Visa",
+      "assigned_attorney": "Daniel K. Morrison",
+      "date_opened": "2026-09-24",
+      "documents_received": [
+        "Passport (biographic page)",
+        "Degree certificates",
+        "Academic transcripts",
+        "Credential evaluation (for foreign degrees)",
+        "Resume / CV",
+        "Current I-94 record"
+      ]
+    },
+    {
+      "case_id": "IMM-2026-0110",
+      "full_name": "Amira Haddad",
+      "address": {
+        "street": "903 Prairie View Court",
+        "city": "Chicago",
+        "state": "IL",
+        "postal_code": "60601"
+      },
+      "email": "amira.haddad@example.com",
+      "phone": "(312) 555-0174",
+      "country_of_citizenship": "Jordan",
+      "case_type": "Family-Based Green Card",
+      "assigned_attorney": "Elena V. Petrova",
+      "date_opened": "2026-07-30",
+      "documents_received": [
+        "Marriage certificate",
+        "Birth certificate",
+        "Passport (biographic page)",
+        "Passport-style photos (2)",
+        "Proof of spouse's U.S. citizenship",
+        "Joint financial records",
+        "Photos and correspondence showing the relationship",
+        "Sponsor's most recent federal tax return"
+      ]
     }
   ]
 }

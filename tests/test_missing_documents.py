@@ -58,16 +58,19 @@ def test_unknown_case_type_fails_clearly():
         requirements_for("Tourist Visa", {"Asylum": ["Passport"]})
 
 
-def test_sample_data_covers_both_letter_paths():
-    """The demo data should exercise both 'request letter' and 'nothing missing, skip' paths."""
+def test_sample_data_covers_every_path():
+    """The demo data should exercise every letter path for every case type."""
     requirements = load_requirements(REQUIREMENTS_FILE)
     clients = [parse_client(r) for r in load_client_records(CLIENTS_FILE)]
-    missing = {c.case_type: compute_document_status(requirements_for(c.case_type, requirements), c.documents_received).missing
+    missing = {c.case_id: compute_document_status(requirements_for(c.case_type, requirements), c.documents_received).missing
                for c in clients}
 
-    assert set(missing) == {"H-1B Work Visa", "Family-Based Green Card", "Asylum", "Naturalization"}
-    assert missing["Naturalization"] == []
-    assert all(missing[t] for t in ("H-1B Work Visa", "Family-Based Green Card", "Asylum"))
+    assert len(clients) == 10 and len(set(missing)) == 10  # unique case IDs
+    assert {c.case_type for c in clients} == set(requirements)
+    complete = [cid for cid, m in missing.items() if not m]
+    assert len(complete) == 3  # filing cover letters
+    assert any(len(m) == 1 for m in missing.values())  # singular "1 document" wording
+    assert any(not c.documents_received for c in clients)  # nothing received yet
 
 
 def _record(**overrides):

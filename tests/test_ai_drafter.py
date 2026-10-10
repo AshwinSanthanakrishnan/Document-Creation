@@ -129,3 +129,26 @@ def test_daily_quota_stops_further_calls_without_long_waits(monkeypatch):
     assert sleeps == [3.0]  # normal short retry, not a 31-minute (or 60s) wait
     assert not drafter.enabled
     assert "daily quota" in drafter.disabled_reason
+
+
+def test_same_prompt_is_drafted_once_and_reused():
+    calls = []
+
+    def generate(prompt):
+        calls.append(prompt)
+        return GOOD
+
+    drafter = GeminiDrafter(api_key=None, model="fake-model", retry_delay=0, generate=generate)
+    first = drafter.draft("scope_of_services", case_type="Asylum")
+    second = drafter.draft("scope_of_services", case_type="Asylum")
+    other = drafter.draft("scope_of_services", case_type="Naturalization")
+
+    assert len(calls) == 2  # Asylum once, Naturalization once
+    assert second.text == first.text and second.reused and not first.reused
+    assert not other.reused
+
+
+def test_failures_are_not_cached():
+    drafter = _drafter([ConnectionError("x"), ConnectionError("x"), GOOD])
+    assert drafter.draft("next_steps", case_type="Asylum").used_fallback
+    assert not drafter.draft("next_steps", case_type="Asylum").used_fallback

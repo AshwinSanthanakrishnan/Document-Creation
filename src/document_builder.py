@@ -215,6 +215,8 @@ def _write_docx_block(doc, block: Block) -> None:
             _run(p, f"Exhibit {exhibit_label(i)}", bold=True)
             p.add_run(f"\t{item}")
     elif kind == "signature":
+        # Never leave the signature alone on a page: keep the closing paragraph with it.
+        doc.paragraphs[-1].paragraph_format.keep_with_next = True
         for i, line in enumerate(lines):
             p = doc.add_paragraph(line)
             last = i == len(lines) - 1
@@ -294,7 +296,12 @@ def write_pdf(blocks: list[Block], path: Path, *, title: str, case_id: str) -> N
         HRFlowable(width="100%", thickness=0.8, color=PDF_NAVY, spaceAfter=18),
     ]
     for block in blocks:
-        story.extend(_pdf_block(block))
+        flowables = _pdf_block(block)
+        if block.kind == "signature" and isinstance(story[-1], Paragraph):
+            # Never leave the signature alone on a page: move the closing paragraph with it.
+            story[-1] = KeepTogether([story[-1], *flowables])
+        else:
+            story.extend(flowables)
     # A trailing gap near the bottom of a page would otherwise spill onto a new, empty page.
     while story and isinstance(story[-1], Spacer):
         story.pop()

@@ -15,7 +15,7 @@ import json
 import logging
 import re
 import time
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from typing import Callable
 
 log = logging.getLogger(__name__)
@@ -100,6 +100,7 @@ class DraftResult:
     model: str | None
     attempts: int
     error: str | None = None
+    reused: bool = False  # same prompt already answered earlier in this run
 
     @property
     def used_fallback(self) -> bool:
@@ -112,6 +113,7 @@ class DraftResult:
             "model": self.model,
             "attempts": self.attempts,
             "error": self.error,
+            "reused": self.reused,
         }
 
 
@@ -182,6 +184,9 @@ class GeminiDrafter:
         self.retry_delay = retry_delay
         self.disabled_reason: str | None = None
         self._generate = generate
+        # Paragraphs depend only on the case type (and document count), so clients with the
+        # same case type reuse one Gemini draft: fewer API calls and consistent wording.
+        self._cache: dict[str, DraftResult] = {}
 
         if self._generate is None:
             if offline:
@@ -203,12 +208,18 @@ class GeminiDrafter:
             return self._fallback(section, context, attempts=0, error=f"AI drafting disabled: {self.disabled_reason}")
 
         prompt = PROMPTS[section].format(**context)
+        if prompt in self._cache:
+            log.info("    Reused Gemini draft for '%s' (same case type earlier in this run)", section)
+            return replace(self._cache[prompt], attempts=0, reused=True)
+
         last_exc: Exception | None = None
         for attempt in range(1, MAX_ATTEMPTS + 1):
             try:
                 text = clean_ai_text(self._generate(prompt))
                 log.info("    Gemini drafted '%s' (%d words, attempt %d)", section, len(text.split()), attempt)
-                return DraftResult(section, text, "gemini", self.model, attempt)
+                result = DraftResult(section, text, "gemini", self.model, attempt)
+                self._cache[prompt] = result  # only successful drafts; failures get a fresh try next time
+                return result
             except Exception as exc:  # network, quota, safety block, or unusable text
                 last_exc = exc
                 log.warning("    Gemini call for '%s' failed (attempt %d/%d): %s", section, attempt, MAX_ATTEMPTS, _short_error(exc))

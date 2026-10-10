@@ -123,6 +123,7 @@ def write_run_report(results: list[ClientResult], info: RunInfo, path: Path) -> 
     files = sum(len(r.files) for r in results)
     ai_total = sum(len(r.ai_sections) for r in results)
     ai_fallback = sum(len(r.fallbacks) for r in results)
+    ai_reused = sum(1 for r in results for d in r.ai_sections if d.reused)
 
     lines = [
         "# Run Report: Legal Document Generator",
@@ -138,7 +139,8 @@ def write_run_report(results: list[ClientResult], info: RunInfo, path: Path) -> 
         f"| AI drafting | {info.ai_mode} |",
         f"| Clients processed | {len(results)} ({len(succeeded)} succeeded, {len(failed)} failed) |",
         f"| Documents generated | {letters} letters ({files} files: .docx + .pdf) |",
-        f"| AI sections | {ai_total - ai_fallback} drafted by Gemini, {ai_fallback} used fallback text |",
+        f"| AI sections | {ai_total - ai_fallback} from Gemini ({ai_reused} reused for clients with the same case type), "
+        f"{ai_fallback} used fallback text |",
         f"| Log file | `{display_path(info.log_file)}` |",
         "",
         "## Clients",
