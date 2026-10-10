@@ -1,0 +1,93 @@
+{
+  "_notice": "FICTIONAL SAMPLE DATA. Every person, address, email, phone number and case ID in this file is invented for demonstration. Phone numbers use the reserved 555-01xx range and emails use the reserved example.com domain.",
+  "clients": [
+    {
+      "case_id": "IMM-2026-0101",
+      "full_name": "Priya Raman",
+      "address": {
+        "street": "2148 Lakeview Terrace, Apt 5B",
+        "city": "Austin",
+        "state": "TX",
+        "postal_code": "78704"
+      },
+      "email": "priya.raman@example.com",
+      "phone": "(512) 555-0143",
+      "country_of_citizenship": "India",
+      "case_type": "H-1B Work Visa",
+      "assigned_attorney": "Daniel K. Morrison",
+      "date_opened": "2026-09-02",
+      "documents_received": [
+        "Passport (biographic page)",
+        "Resume / CV",
+        "Degree certificates",
+        "Recent pay stubs"
+      ]
+    },
+    {
+      "case_id": "IMM-2026-0102",
+      "full_name": "Mateo Alvarez",
+      "address": {
+        "street": "817 Harbor View Drive",
+        "city": "San Diego",
+        "state": "CA",
+        "postal_code": "92101"
+      },
+      "email": "mateo.alvarez@example.com",
+      "phone": "(619) 555-0178",
+      "country_of_citizenship": "Mexico",
+      "case_type": "Family-Based Green Card",
+      "assigned_attorney": "Elena V. Petrova",
+      "date_opened": "2026-09-15",
+      "documents_received": [
+        "Marriage certificate",
+        "Birth certificate",
+        "Passport (biographic page)",
+        "Proof of spouse's U.S. citizenship"
+      ]
+    },
+    {
+      "case_id": "IMM-2026-0103",
+      "full_name": "Lucia Mendoza",
+      "address": {
+        "street": "45 Riverside Court, Unit 12",
+        "city": "Miami",
+        "state": "FL",
+        "postal_code": "33130"
+      },
+      "email": "lucia.mendoza@example.com",
+      "phone": "(305) 555-0121",
+      "country_of_citizenship": "Venezuela",
+      "case_type": "Asylum",
+      "assigned_attorney": "Elena V. Petrova",
+      "date_opened": "2026-09-28",
+      "documents_received": [
+        "Passport or national identity document",
+        "I-94 arrival/departure record"
+      ]
+    },
+    {
+      "case_id": "IMM-2026-0104",
+      "full_name": "Wei Chen",
+      "address": {
+        "street": "3302 Maple Ridge Road",
+        "city": "Seattle",
+        "state": "WA",
+        "postal_code": "98103"
+      },
+      "email": "wei.chen@example.com",
+      "phone": "(206) 555-0165",
+      "country_of_citizenship": "China",
+      "case_type": "Naturalization",
+      "assigned_attorney": "Daniel K. Morrison",
+      "date_opened": "2026-08-20",
+      "documents_received": [
+        "Permanent resident card (front and back)",
+        "Passport (biographic page)",
+        "Passport-style photos (2)",
+        "Travel history: trips outside the U.S. (last 5 years)",
+        "Residence and employment history (last 5 years)",
+        "Federal tax returns or IRS transcripts (last 5 years)"
+      ]
+    }
+  ]
+}

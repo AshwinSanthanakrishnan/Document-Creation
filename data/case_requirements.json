@@ -1,0 +1,68 @@
+{
+  "_disclaimer": "SAMPLE REFERENCE DATA FOR DEMONSTRATION ONLY. NOT LEGAL ADVICE. These lists are simplified illustrations of documents commonly gathered for each case type. Actual requirements depend on the individual case and current agency rules, and must be set by a licensed attorney.",
+  "case_types": {
+    "H-1B Work Visa": {
+      "description": "Employer-sponsored temporary work visa for a specialty occupation.",
+      "filing_forms": [
+        "Form I-129, Petition for a Nonimmigrant Worker"
+      ],
+      "required_documents": [
+        "Passport (biographic page)",
+        "Degree certificates",
+        "Academic transcripts",
+        "Credential evaluation (for foreign degrees)",
+        "Resume / CV",
+        "Employer support letter",
+        "Labor Condition Application (LCA)",
+        "Current I-94 record"
+      ]
+    },
+    "Family-Based Green Card": {
+      "description": "Permanent residence based on marriage to a U.S. citizen.",
+      "filing_forms": [
+        "Form I-130, Petition for Alien Relative",
+        "Form I-485, Application to Register Permanent Residence or Adjust Status"
+      ],
+      "required_documents": [
+        "Marriage certificate",
+        "Birth certificate",
+        "Passport (biographic page)",
+        "Passport-style photos (2)",
+        "Proof of spouse's U.S. citizenship",
+        "Joint financial records",
+        "Photos and correspondence showing the relationship",
+        "Sponsor's most recent federal tax return"
+      ]
+    },
+    "Asylum": {
+      "description": "Protection for a person who fears persecution in their home country.",
+      "filing_forms": [
+        "Form I-589, Application for Asylum and for Withholding of Removal"
+      ],
+      "required_documents": [
+        "Passport or national identity document",
+        "Birth certificate",
+        "I-94 arrival/departure record",
+        "Passport-style photos (2)",
+        "Personal declaration (written statement)",
+        "Supporting evidence (police, medical, or news records)",
+        "Witness statements or affidavits",
+        "Country conditions evidence"
+      ]
+    },
+    "Naturalization": {
+      "description": "U.S. citizenship for an eligible lawful permanent resident.",
+      "filing_forms": [
+        "Form N-400, Application for Naturalization"
+      ],
+      "required_documents": [
+        "Permanent resident card (front and back)",
+        "Passport (biographic page)",
+        "Passport-style photos (2)",
+        "Travel history: trips outside the U.S. (last 5 years)",
+        "Residence and employment history (last 5 years)",
+        "Federal tax returns or IRS transcripts (last 5 years)"
+      ]
+    }
+  }
+}
