@@ -239,14 +239,14 @@ def main(argv: list[str] | None = None) -> int:
         ai_mode += f", then disabled mid-run: {drafter.disabled_reason}"
 
     info = RunInfo(started_at, datetime.now().astimezone(), scope, ai_mode, log_file)
-    report = write_run_report(results, info, config.OUTPUT_DIR / "run_report.md")
+    reports = write_run_report(results, info, config.OUTPUT_DIR)
 
     failed = [r for r in results if r.status != "success"]
     letters = sum(len(r.documents_generated) for r in results)
     fallbacks = sum(len(r.fallbacks) for r in results)
     log.info("Done in %.1fs: %d client(s), %d letter(s), %d failure(s), %d AI fallback(s)",
              info.duration_seconds, len(results), letters, len(failed), fallbacks)
-    log.info("Run report: %s", display_path(report))
+    log.info("Run report: %s", ", ".join(display_path(p) for p in reports))
     log.info("Log file:   %s", display_path(log_file))
     return 1 if failed else 0
 

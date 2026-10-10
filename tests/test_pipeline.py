@@ -41,7 +41,7 @@ def test_failed_client_is_reported_and_the_run_continues(tmp_path, monkeypatch):
     assert all(s["source"] == "fallback" for s in metadata["ai_sections"])
 
     report = (tmp_path / "outputs" / "run_report.md").read_text()
-    assert "1 succeeded, 1 failed" in report
+    assert "Clients that need attention" in report
     assert "Unknown case type 'Tourist Visa'" in report
     assert not (tmp_path / "outputs" / "TEST-BAD").exists()
     assert list((tmp_path / "logs").glob("run_*.log"))

@@ -1,4 +1,4 @@
-"""Per-client metadata.json files and the run-level run_report.md."""
+"""Per-client metadata.json files and the run-level report (run_report.md, .docx and .pdf)."""
 
 from __future__ import annotations
 
@@ -10,6 +10,7 @@ from pathlib import Path
 
 from src.ai_drafter import DraftResult
 from src.config import PROJECT_ROOT, SAFETY_HEADER
+from src.report_builder import write_report_docx, write_report_pdf
 
 DOCUMENT_LABELS = {
     "engagement_letter": "Engagement letter",
@@ -115,105 +116,115 @@ def write_metadata(result: ClientResult, out_dir: Path) -> Path:
     return path
 
 
-def write_run_report(results: list[ClientResult], info: RunInfo, path: Path) -> Path:
-    """Write a Markdown summary of the whole run."""
-    succeeded = [r for r in results if r.status == "success"]
+@dataclass
+class ReportPart:
+    """One piece of the run report, rendered to Markdown, .docx and .pdf alike.
+
+    kind: title, note, kv, heading, table, bullets, paragraph
+    Text may use Markdown `code` and **bold**; the .docx/.pdf writers handle both.
+    """
+
+    kind: str
+    content: str | list = ""
+    header: list[str] | None = None  # table column names
+
+
+def build_run_report(results: list[ClientResult], info: RunInfo) -> list[ReportPart]:
+    """Lay out the summary for firm staff once, for every output format."""
     failed = [r for r in results if r.status != "success"]
+    done = [r for r in results if r.status == "success"]
+    ready = [r for r in done if not r.missing_documents]
+    waiting = [r for r in done if r.missing_documents]
     letters = sum(len(r.documents_generated) for r in results)
-    files = sum(len(r.files) for r in results)
-    ai_total = sum(len(r.ai_sections) for r in results)
-    ai_fallback = sum(len(r.fallbacks) for r in results)
-    ai_reused = sum(1 for r in results for d in r.ai_sections if d.reused)
 
-    lines = [
-        "# Run Report: Legal Document Generator",
-        "",
-        f"> **{SAFETY_HEADER}** Every generated document is a draft that a licensed attorney must review. "
-        "All client data in this demo is fictional.",
-        "",
-        "| | |",
-        "|---|---|",
-        f"| Run started | {info.started_at.strftime('%Y-%m-%d %H:%M:%S %Z')} |",
-        f"| Total time | {info.duration_seconds:.1f} seconds |",
-        f"| Scope | {info.scope} |",
-        f"| AI drafting | {info.ai_mode} |",
-        f"| Clients processed | {len(results)} ({len(succeeded)} succeeded, {len(failed)} failed) |",
-        f"| Documents generated | {letters} letters ({files} files: .docx + .pdf) |",
-        f"| AI sections | {ai_total - ai_fallback} from Gemini ({ai_reused} reused for clients with the same case type), "
-        f"{ai_fallback} used fallback text |",
-        f"| Log file | `{display_path(info.log_file)}` |",
-        "",
-        "## Clients",
-        "",
-        "| Case ID | Client | Case type | Documents generated | Missing docs | AI fallbacks | Status | Time |",
-        "|---|---|---|---|---|---|---|---|",
+    parts = [
+        ReportPart("title", "Client Letters Summary"),
+        ReportPart("note", f"**{SAFETY_HEADER}** Every letter listed here is a draft. An attorney must review it "
+                           "before it is sent."),
+        ReportPart("kv", [
+            ["Prepared on", f"{info.started_at:%B} {info.started_at.day}, {info.started_at.year}"],
+            ["Clients", str(len(results))],
+            ["Letters prepared", f"{letters} (each saved as a Word file and a PDF)"],
+            ["Ready to file", f"{len(ready)} client(s): all required documents received"],
+            ["Waiting on documents", f"{len(waiting)} client(s): a document request letter is ready to send"],
+        ]),
+        ReportPart("heading", "Clients"),
     ]
+    rows = []
     for r in results:
-        generated = ", ".join(DOCUMENT_LABELS.get(d, d) for d in r.documents_generated) or "none"
-        missing = f"{len(r.missing_documents)} of {r.required_count}" if r.required_count else "n/a"
-        status = "✅ Success" if r.status == "success" else "❌ Failed"
-        fallback = f"⚠️ {len(r.fallbacks)}" if r.fallbacks else "0"
-        lines.append(
-            f"| `{r.case_id}` | {r.client_name} | {r.case_type} | {generated} | {missing} | {fallback} | {status} | {r.duration_seconds:.1f}s |"
-        )
+        letters_made = ", ".join(DOCUMENT_LABELS.get(d, d) for d in r.documents_generated) or "None"
+        received = f"{r.required_count - len(r.missing_documents)} of {r.required_count}" if r.required_count else "n/a"
+        if r.status != "success":
+            next_step = "Letters could not be prepared; see below"
+        elif r.missing_documents:
+            next_step = f"Send the document request ({len(r.missing_documents)} still needed)"
+        else:
+            next_step = "Ready to file: review the filing cover letter"
+        rows.append([f"`{r.case_id}`", r.client_name, r.case_type, letters_made, received, next_step])
+    parts.append(ReportPart("table", rows, header=[
+        "Case ID", "Client", "Case type", "Letters prepared", "Documents received", "Next step"]))
 
-    lines += ["", "## Missing documents", ""]
-    with_missing = [r for r in results if r.missing_documents]
-    if not with_missing:
-        lines.append("No outstanding documents.")
-    for r in with_missing:
-        lines.append(f"**`{r.case_id}` {r.client_name}** ({r.case_type}): {len(r.missing_documents)} missing")
-        lines += [f"- {doc}" for doc in r.missing_documents]
-        lines.append("")
+    parts.append(ReportPart("heading", "Documents still needed from clients"))
+    if not waiting:
+        parts.append(ReportPart("paragraph", "None. Every client has sent all required documents."))
+    for r in waiting:
+        parts.append(ReportPart("paragraph", f"**`{r.case_id}` {r.client_name}** ({r.case_type}): "
+                                             f"{len(r.missing_documents)} still needed"))
+        parts.append(ReportPart("bullets", list(r.missing_documents)))
     unrecognized = [r for r in results if r.unrecognized_documents]
     if unrecognized:
-        if lines[-1]:
-            lines.append("")
-        lines += ["Received but not on the requirements list (kept on file, not counted):", ""]
-        lines += [f"- `{r.case_id}`: {', '.join(r.unrecognized_documents)}" for r in unrecognized]
+        parts.append(ReportPart("paragraph", "Extra documents received that are not on the checklist (kept on file):"))
+        parts.append(ReportPart("bullets", [f"`{r.case_id}` {r.client_name}: {', '.join(r.unrecognized_documents)}"
+                                            for r in unrecognized]))
 
-    lines += ["", "## Skipped documents", ""]
-    skipped = [(r, s) for r in results for s in r.skipped]
-    if not skipped:
-        lines.append("None.")
-    for r, s in skipped:
-        lines.append(f"- `{r.case_id}` {DOCUMENT_LABELS.get(s['document'], s['document'])}: {s['reason']}")
+    if failed:
+        parts.append(ReportPart("heading", "Clients that need attention"))
+        parts.append(ReportPart("paragraph", "Letters could not be prepared for these clients. Check their case details "
+                                             "and run them again."))
+        parts.append(ReportPart("table", [[f"`{r.case_id}`", r.client_name, r.error or ""] for r in failed],
+                                header=["Case ID", "Client", "Problem"]))
 
-    lines += ["", "## ⚠️ AI fallbacks: need attorney attention", ""]
-    fallbacks = [(r, s) for r in results for s in r.fallbacks]
-    if not fallbacks:
-        lines.append("None. Every AI section was drafted by Gemini.")
-    else:
-        lines += [
-            "These sections use neutral template text instead of a tailored Gemini draft. "
-            "Review and personalize them before sending.",
-            "",
-            "| Case ID | Section | Attempts | Reason |",
-            "|---|---|---|---|",
-        ]
-        lines += [
-            f"| `{r.case_id}` | {SECTION_LABELS.get(s.section, s.section)} | {s.attempts} | {s.error or 'unknown'} |"
-            for r, s in fallbacks
-        ]
-
-    lines += ["", "## Failures", ""]
-    if not failed:
-        lines.append("None.")
-    else:
-        lines += ["| Case ID | Client | Error |", "|---|---|---|"]
-        lines += [f"| `{r.case_id}` | {r.client_name} | {r.error} |" for r in failed]
-
-    lines += [
-        "",
-        "## Validation",
-        "",
-        f"- {files} files were re-opened after writing and checked for unfilled `{{{{ }}}}` placeholders "
-        "and the safety banner on every page. All of them passed; any file that fails is deleted and its client "
-        "is marked failed.",
-        "- Client names, addresses, case IDs, dates and document lists come straight from the data files. "
-        "Only the prose sections listed above come from AI.",
-        "",
+    parts += [
+        ReportPart("heading", "Before sending any letter"),
+        ReportPart("bullets", [
+            "Read each letter and confirm the client's name, address and case details.",
+            "Fill in the highlighted items: fees, filing fees and the filing address.",
+            "Remove the DRAFT banner only after the attorney has approved the letter.",
+            "Letters are saved in the outputs folder, in one folder per case ID.",
+        ]),
     ]
+    return parts
 
-    path.write_text("\n".join(lines), encoding="utf-8")
-    return path
+
+def _md_row(cells: list[str]) -> str:
+    return "| " + " | ".join(c.replace("|", "\\|") for c in cells) + " |"
+
+
+def render_markdown(parts: list[ReportPart]) -> str:
+    out = []
+    for part in parts:
+        if part.kind == "title":
+            out.append(f"# {part.content}")
+        elif part.kind == "heading":
+            out.append(f"## {part.content}")
+        elif part.kind == "note":
+            out.append(f"> {part.content}")
+        elif part.kind == "paragraph":
+            out.append(part.content)
+        elif part.kind == "bullets":
+            out.append("\n".join(f"- {item}" for item in part.content))
+        elif part.kind in ("kv", "table"):
+            header = part.header or ["", ""]
+            lines = [_md_row(header), "|" + "---|" * len(header)]
+            out.append("\n".join(lines + [_md_row(row) for row in part.content]))
+        else:
+            raise ValueError(f"Unknown report part '{part.kind}'")
+    return "\n\n".join(out) + "\n"
+
+
+def write_run_report(results: list[ClientResult], info: RunInfo, out_dir: Path) -> list[Path]:
+    """Write run_report.md, run_report.docx and run_report.pdf; return their paths."""
+    parts = build_run_report(results, info)
+    md_path = out_dir / "run_report.md"
+    md_path.write_text(render_markdown(parts), encoding="utf-8")
+    return [md_path, write_report_docx(parts, out_dir / "run_report.docx"), write_report_pdf(parts, out_dir / "run_report.pdf")]

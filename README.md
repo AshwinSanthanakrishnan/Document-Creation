@@ -41,7 +41,7 @@ python main.py --offline                # no AI; uses standard paragraphs
 pytest                                  # run the tests
 ```
 
-The letters appear in `outputs/<case_id>/`, and a summary is in `outputs/run_report.md`.
+The letters appear in `outputs/<case_id>/`, and the run summary is in `outputs/run_report.md`, `.docx` and `.pdf`.
 
 ## Sample output
 
