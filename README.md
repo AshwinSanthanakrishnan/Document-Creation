@@ -178,6 +178,10 @@ The report also lists every missing document per client, skipped letters and why
 - **Secrets stay out of the code.** The API key is read from `.env`, which is git-ignored. `.env.example` shows the format.
 - **In production**, this would read from the firm's case management system (for example Clio, Docketwise or INSZoom) through its API instead of JSON files. It would run under a service account with least-privilege, read-only access to the matters it needs, use an AI provider under a data processing agreement with zero data retention, keep generated drafts inside the firm's document management system rather than on a local disk, and log who generated and approved each letter. Sending to clients would stay a human step.
 
+## License
+
+Licensed under the [Apache License 2.0](LICENSE). See [NOTICE](NOTICE).
+
 ## Project structure
 
 ```

@@ -1,0 +1,6 @@
+Legal Document Generator
+Copyright 2026 Ashwin Santhanakrishnan
+
+This product includes software developed by third parties under their own
+licenses, including python-docx, reportlab, pypdf, google-genai and
+python-dotenv. Each dependency keeps its own license.
